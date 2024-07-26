@@ -16,4 +16,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "vkCore"
 
+<<<<<<< HEAD
 include(":app")
+=======
+include(":plan1")
+include(":app")
+>>>>>>> b93521a (update Resources)

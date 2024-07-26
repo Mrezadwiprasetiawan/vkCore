@@ -19,18 +19,12 @@ android {
         vectorDrawables { 
             useSupportLibrary = true
         }
-<<<<<<< HEAD
-        
-=======
->>>>>>> b93521a (update Resources)
         externalNativeBuild{
           cmake{
             abiFilters("arm64-v8a")
           }
         }
     }
-<<<<<<< HEAD
-=======
 	signingConfigs{
         create("release"){
             storeFile=file("release.key")
@@ -39,7 +33,6 @@ android {
             keyPassword="080402"
         }
     }
->>>>>>> b93521a (update Resources)
     
     externalNativeBuild{
           cmake{
@@ -53,17 +46,11 @@ android {
     }
 
     buildTypes {
-<<<<<<< HEAD
-        release {
-            isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-=======
         getByName("release") {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig=signingConfigs.getByName("release")
             isDebuggable = false
->>>>>>> b93521a (update Resources)
         }
     }
 
