@@ -5,16 +5,17 @@ import android.os.Bundle;
 import rpengine.core.vkcore.databinding.ActivityMainBinding;
 
 public class MainActivity extends Activity {
-	
-	  private ActivityMainBinding binding;
-	
+
+    private ActivityMainBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-		    binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+		binding.text.setText("Instance Version:"+Utils.InstanceVersion()+"\n"+Utils.API());
     }
-    
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
