@@ -16,9 +16,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "vkCore"
 
-<<<<<<< HEAD
+include(":vulkan_check")
 include(":app")
-=======
-include(":plan1")
-include(":app")
->>>>>>> b93521a (update Resources)
