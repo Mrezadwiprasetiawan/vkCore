@@ -13,8 +13,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-		binding.text.setText("Instance Version:"+Utils.InstanceVersion()+"\n"+Utils.API());
-    }
+	}
 
     @Override
     protected void onDestroy() {

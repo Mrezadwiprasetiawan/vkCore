@@ -1,23 +1,5 @@
 #include "utils.h"
 
-
-JNIEXPORT jstring JNICALL Java_rpengine_core_vkcore_Utils_InstanceVersion(JNIEnv* env, jclass* javathis){
-	return env->NewStringUTF(InsVers().c_str());
-}
-JNIEXPORT jstring JNICALL Java_rpengine_core_vkcore_Utils_API(JNIEnv* env, jclass* javathis){
-	return env->NewStringUTF(API().c_str());
-}
-
-std::string InsVers(void){
-  uint32_t insVers;
-  if(VK_SUCCESS!=vkEnumerateInstanceVersion(&insVers)){
-    return "Tidak ada vulkan Instance";
-  };
-  std::stringstream ss;
-  ss<<VK_VERSION_MAJOR(insVers)<<"."<<VK_VERSION_MINOR(insVers)<<"."<<VK_VERSION_PATCH(insVers)<<std::endl;
-  return ss.str();
-}
-
 std::string API(void){
   std::stringstream ss;
   VkInstance ins;
@@ -39,7 +21,7 @@ std::string API(void){
 	};
 	
 	if(vkCreateInstance(&insInfo, nullptr, &ins) != VK_SUCCESS){
-		return "failed to create Instance";
+		return "gagal membuat instance";
 	}
 	
 	//membuat container GPU dan properti GPU
