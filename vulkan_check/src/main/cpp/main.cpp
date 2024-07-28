@@ -1,10 +1,10 @@
 #include "main.h"
 
 extern "C"{
-  JNIEXPORT jstring JNICALL Java_rpengine_core_vkcore_Utils_InstanceVersion(JNIEnv* env, jclass* javathis){
+  JNIEXPORT jstring JNICALL Java_rpengine_core_vkcore_Utils_Instance(JNIEnv* env, jclass* clz){
     return env->NewStringUTF(InsVers().c_str());
   }
-  JNIEXPORT jstring JNICALL Java_rpengine_core_vkcore_Utils_API(JNIEnv* env, jclass* javathis){
+  JNIEXPORT jstring JNICALL Java_rpengine_core_vkcore_Utils_API(JNIEnv* env, jclass* clz){
 	  return env->NewStringUTF(API().c_str());
   }
 }
@@ -15,7 +15,7 @@ std::string InsVers(void){
     return "Tidak ada vulkan Instance";
   };
   std::stringstream ss;
-  ss<<VK_VERSION_MAJOR(insVers)<<"."<<VK_VERSION_MINOR(insVers)<<"."<<VK_VERSION_PATCH(insVers)<<std::endl;
+  ss<<"Instance Version"<<VK_VERSION_MAJOR(insVers)<<"."<<VK_VERSION_MINOR(insVers)<<"."<<VK_VERSION_PATCH(insVers)<<std::endl;
   return ss.str();
 }
 

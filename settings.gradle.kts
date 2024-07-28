@@ -17,4 +17,4 @@ dependencyResolutionManagement {
 rootProject.name = "vkCore"
 
 include(":vulkan_check")
-include(":app")
+include(":vulkan_basic_rendering")
