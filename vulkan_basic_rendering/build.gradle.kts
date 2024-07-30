@@ -1,12 +1,11 @@
 plugins {
     id("com.android.application")
-    
 }
 
 android {
     namespace = "rpengine.core.vkcore"
     compileSdk = 33
-    
+
     defaultConfig {
         applicationId = "rpengine.core.vkcore"
         minSdk = 28
@@ -18,42 +17,43 @@ android {
         vectorDrawables { 
             useSupportLibrary = true
         }
-        externalNativeBuild{
-          cmake{
-            abiFilters("arm64-v8a")
-          }
-        }
-		}
-	signingConfigs{
-        create("release"){
-            storeFile=file("release.key")
-            storePassword="080402"
-            keyAlias="praskey"
-            keyPassword="080402"
+        externalNativeBuild {
+            cmake {
+                abiFilters("arm64-v8a")
+            }
         }
     }
-    
-    externalNativeBuild{
-          cmake{
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("release.key")
+
+            if (rootProject.file("secrets.gradle.kts").exists()) {
+                apply(from = "secrets.gradle.kts")
+            } else {
+                storePassword = System.getenv("STORE_PASSWORD") ?: "default_store_password"
+                keyAlias = System.getenv("KEY_ALIAS") ?: "default_key_alias"
+                keyPassword = System.getenv("KEY_PASSWORD") ?: "default_key_password"
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
             path(file("src/main/cpp/CMakeLists.txt"))
-          }
+        }
     }
-    
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildTypes {
-
-        release {
-            isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-			}
         getByName("release") {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig=signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("release")
             isDebuggable = false
         }
     }
@@ -61,9 +61,5 @@ android {
     buildFeatures {
         viewBinding = true
         prefab = true
-        
     }
-    
 }
-
-

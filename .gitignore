@@ -10,6 +10,9 @@
 # Java class files
 *.class
 
+# Secrets file
+secrets.gradle.kts
+
 # Generated files
 /bin/
 /gen/
