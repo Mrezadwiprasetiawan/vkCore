@@ -11,7 +11,7 @@
   - Create JNI as bridge native to Java
   - Create Java Utils as Runner
   - bridge Surface from native to Java
-+ Full native
+### Full native
   - Create nativeActivity
   - Implement all Vulkan function
   - swapchain nativeActivity and Vulkan function
