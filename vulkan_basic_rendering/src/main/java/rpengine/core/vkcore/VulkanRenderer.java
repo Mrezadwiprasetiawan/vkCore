@@ -8,8 +8,8 @@ public class VulkanRenderer {
 	}
 	
 	private long handle;
-	public VulkanRenderer(){
-		handle=Init();
+	public VulkanRenderer(Surface surface){
+		handle=Init(surface);
 	}
 	public static native long Init(Surface surface);
 	public static native void CleanUp(long handle);
