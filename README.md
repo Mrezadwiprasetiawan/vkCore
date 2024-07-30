@@ -7,9 +7,6 @@
   - Create Java Utils to get native Vulkan function for checker ✓
   - run ✓
 + Vulkan Renderer basic(vulkan_basic)
-
-
-### Vulkan native Utils and runner with JNI
   - Create native Utils for every Vulkan function
   - Create JNI as bridge native to Java
   - Create Java Utils as Runner
