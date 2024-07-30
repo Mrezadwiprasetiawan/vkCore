@@ -1,6 +1,7 @@
 #include "main.h"
 
 //main Method
+//unimplemented yet
 JNIEXPORT void JNICALL Java_rpengine_core_vkcore_VulkanRenderer_Init(JNIEnv* env, jclass* clz){
 	
 }

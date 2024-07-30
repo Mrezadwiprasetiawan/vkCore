@@ -25,6 +25,7 @@ secrets.gradle.kts
 #androidIDE file
 .androidIDE/
 
+
 # Local configuration file (sdk path, etc)
 local.properties
 

@@ -29,7 +29,7 @@ android {
             storeFile = file("release.key")
 
             if (rootProject.file("secrets.gradle.kts").exists()) {
-                apply(from = "secrets.gradle.kts")
+                apply(from = rootProject.file("secrets.gradle.kts"))
             } else {
                 storePassword = System.getenv("STORE_PASSWORD") ?: "default_store_password"
                 keyAlias = System.getenv("KEY_ALIAS") ?: "default_key_alias"

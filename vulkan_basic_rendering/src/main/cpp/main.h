@@ -1,6 +1,6 @@
 #pragma once
 #include <jni.h>
-#include "vulkanRenderer.h"
+#include "vkRenderer.h"
 #include "utils.h"
 #ifdef __cplusplus
 extern "C"{
