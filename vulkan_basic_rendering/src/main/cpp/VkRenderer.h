@@ -10,7 +10,7 @@ class VkRenderer{
 	VkSurfaceKHR surface;
 	ANative_Window* window;
 	public:
-	vulkanRenderer(VkResult result, ANativeWindow* window):inst(VK_NULL_HANDLE),result(result),window(window);
+	vkRenderer(VkResult result, ANativeWindow* window):inst(VK_NULL_HANDLE),result(result),window(window);
 	void Init();
 	void setResult();
 	VkResult getResult();

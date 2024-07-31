@@ -1,4 +1,4 @@
-#pragma once
+ó#pragma once
 #include <vulkan/vulkan.h>
 #include <jni.h>
 #include <sstream>

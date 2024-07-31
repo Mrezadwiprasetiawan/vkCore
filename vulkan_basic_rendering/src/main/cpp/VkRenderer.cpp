@@ -1,6 +1,6 @@
 #include "VkRenderer.h"
 
-VkRenderer::Init{
+VkRenderer::Init(){
 	VkApplicationInfo appInfo{
 		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
 		.pNext = nullptr,
