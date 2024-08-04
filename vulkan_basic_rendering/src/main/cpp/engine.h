@@ -2,13 +2,16 @@
 
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <stdexcept>
+#include <iostream>
+#include <string>
 
 class Engine {
 public:
     Engine();
     ~Engine();
 
-    bool initialize();
+    bool initialize(VkAllocationCallbacks* allocator,std::string* appName,uint32_t appVersion,std::string* engineName,uint32_t engineVers,uint32_t physicalDeviceIndex);
     void cleanup();
     void drawFrame();
 
@@ -30,8 +33,8 @@ private:
 
     std::vector<VkImage> swapChainImages;
 
-    bool createInstance();
-    bool createDevice();
+    bool createInstance(VkAllocationCallbacks* allocator,std::string* appName,uint32_t appVersion,std::string* engineName, uint32_t engineVers);
+    bool createDevice(VkAllocationCallbacks* allocator);
     bool createSwapChain();
     bool createImageViews();
     bool createRenderPass();
@@ -40,6 +43,6 @@ private:
     bool createCommandPool();
     bool createCommandBuffer();
     bool createSemaphores();
-    void pickPhysicalDevice();
+    void pickPhysicalDevice(VkAllocationCallbacks* allocator);
     void cleanupSwapChain();
 };
