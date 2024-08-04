@@ -1,5 +1,5 @@
 # .github/workflows/android-build.yml
-name: Build and Release
+name: Build Release
 
 on:
   push:
