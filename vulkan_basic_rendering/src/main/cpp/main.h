@@ -1,18 +1,21 @@
+// my_functions.h
 #pragma once
 #include <jni.h>
-#include "vkRenderer.h"
-#include "utils.h"
+#include "engine.h"
+
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
-//main method
-JNIEXPORT void JNICALL Java_rpengine_core_vkcore_VulkanRenderer_Init(JNIEnv* env, jclass* clz);
-JNIEXPORT jlong JNICALL Java_rpengine_core_vkcore_VulkanRenderer_CleanUp(JNIEnv* env, jclass* clz);
 
-//utils
-JNIEXPORT jstring JNICALL Java_rpengine_core_vkcore_Utils_InstanceVersion(JNIEnv* env, jclass* clz);
-JNIEXPORT jstring JNICALL Java_rpengine_core_vkcore_Utils_API(JNIEnv* env, jclass* clz);
+#define JNI_FUNCTION(return_type, class_name, method_name) \
+    JNIEXPORT return_type JNICALL Java_rpengine_core_vkcore_##class_name##_##method_name
+
+JNI_FUNCTION(void, Vulkan_Init, (JNIEnv* env, jclass clz));
+JNI_FUNCTION(void, Vulkan_DrawFrame,(JNIEnv* env, jobject* obj))
+JNI_FUNCTION(jlong, Vulkan_CleanUp, (JNIEnv* env, jclass clz));
+JNI_FUNCTION(jstring, Vulkan_InstanceVersion, (JNIEnv* env, jclass clz));
+JNI_FUNCTION(jstring, Vulkan_API, (JNIEnv* env, jclass clz));
 
 #ifdef __cplusplus
 }
