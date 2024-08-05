@@ -16,7 +16,7 @@ Engine::~Engine() {
 bool Engine::initialize(std::string* appName, uint32_t appVersion, std::string* engineName, uint32_t engineVers, uint32_t physicalDeviceIndex, ANativeWindow* window) {
   this->window = window;
   if (!createInstance(appName, appVersion, engineName, engineVers)) return false;
-  pickPhysicalDevice(physicalDeviceIndex);
+  pickPhysicalDevice();
   if (!createDevice()) return false;
   if (!createSurface()) return false;
   if (!createSwapChain()) return false;
