@@ -1,3 +1,5 @@
+//imageView page 6 with image page 5
+
 #include "engine.h"
 
 Engine::Engine() 
@@ -5,16 +7,18 @@ Engine::Engine()
     graphicsQueue(VK_NULL_HANDLE), surface(VK_NULL_HANDLE), swapChain(VK_NULL_HANDLE),
     swapChainImageView(VK_NULL_HANDLE), renderPass(VK_NULL_HANDLE), graphicsPipeline(VK_NULL_HANDLE),
     framebuffer(VK_NULL_HANDLE), commandPool(VK_NULL_HANDLE), commandBuffer(VK_NULL_HANDLE),
-    imageAvailableSemaphore(VK_NULL_HANDLE), renderFinishedSemaphore(VK_NULL_HANDLE) {}
+    imageAvailableSemaphore(VK_NULL_HANDLE), renderFinishedSemaphore(VK_NULL_HANDLE), window(nullptr) {}
 
 Engine::~Engine() {
   cleanup();
 }
 
-bool Engine::initialize(VkAllocationCallbacks* allocator,std::string* appName,uint32_t appVersion,std::string* engineName,uint32_t engineVers,uint32_t physicalDeviceIndex) {
-  if (!createInstance(allocator,appName,appVersion,engineName,engineVers)) return false;
+bool Engine::initialize(std::string* appName, uint32_t appVersion, std::string* engineName, uint32_t engineVers, uint32_t physicalDeviceIndex, ANativeWindow* window) {
+  this->window = window;
+  if (!createInstance(appName, appVersion, engineName, engineVers)) return false;
   pickPhysicalDevice(physicalDeviceIndex);
-  if (!createDevice(allocator)) return false;
+  if (!createDevice()) return false;
+  if (!createSurface()) return false;
   if (!createSwapChain()) return false;
   if (!createImageViews()) return false;
   if (!createRenderPass()) return false;
@@ -26,27 +30,27 @@ bool Engine::initialize(VkAllocationCallbacks* allocator,std::string* appName,ui
   return true;
 }
 
-void Engine::cleanup(VkAllocationCallbacks* allocator) {
+void Engine::cleanup() {
   cleanupSwapChain();
   if (device != VK_NULL_HANDLE) {
-    vkDestroyDevice(device, allocator);
+    vkDestroyDevice(device, nullptr);
     device = VK_NULL_HANDLE;
   }
+  if (surface != VK_NULL_HANDLE) {
+    vkDestroySurfaceKHR(instance, surface, nullptr);
+    surface = VK_NULL_HANDLE;
+  }
   if (instance != VK_NULL_HANDLE) {
-    vkDestroyInstance(instance, allocator);
+    vkDestroyInstance(instance, nullptr);
     instance = VK_NULL_HANDLE;
   }
-  if(surface != VK_NULL_HANDLE){
-		vkDestroySurfaceKHR(surface, allocator);
-	}
 }
 
 void Engine::drawFrame() {
   // Implement frame drawing here
 }
 
-bool Engine::createInstance(VkAllocationCallbacks* allocator,std::string* appName, uint32_t appVersion, std::string* engineName, uint32_t engineVers) {
-  uint32_t* apiVersion;
+bool Engine::createInstance(std::string* appName, uint32_t appVersion, std::string* engineName, uint32_t engineVers) {
   VkApplicationInfo appInfo {
     .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
     .pNext = nullptr,
@@ -56,15 +60,17 @@ bool Engine::createInstance(VkAllocationCallbacks* allocator,std::string* appNam
     .engineVersion = engineVers,
     .apiVersion = VK_API_VERSION_1_0
   };
+
   VkInstanceCreateInfo createInfo {
     .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
     .pNext = nullptr,
     .pApplicationInfo = &appInfo,
     .enabledLayerCount = 0,  // temporary
-    .ppEnabledLayerNames = "",  // temporary
+    .ppEnabledLayerNames = nullptr,  // temporary
     .enabledExtensionCount = 0,  // temporary
-    .ppEnabledExtensionNames = ""  // temporary
+    .ppEnabledExtensionNames = nullptr  // temporary
   };
+
   if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
     return false;
   }
@@ -75,53 +81,158 @@ void Engine::pickPhysicalDevice(uint32_t index) {
   if (instance == VK_NULL_HANDLE) {
     return;
   }
+
   uint32_t physicalDeviceCount;
   if (vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, nullptr) != VK_SUCCESS) {
     return;
   }
-  std::vector<VkPhysicalDevice> tmp(physicalDeviceCount);
-  if (vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, tmp.data()) != VK_SUCCESS) {
+
+  std::vector<VkPhysicalDevice> devices(physicalDeviceCount);
+  if (vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, devices.data()) != VK_SUCCESS) {
     return;
   }
-  if (tmp.size() > 0) {
-    physicalDevice = index >= tmp.size() ? tmp.back() : tmp[index];
+
+  if (!devices.empty()) {
+    physicalDevice = index >= devices.size() ? devices.back() : devices[index];
   }
 }
 
-bool Engine::createDevice(VkAllocationCallbacks* allocator) {
-  VkDeviceQueueCreateInfo queueCreateInfo{
-		.sType=VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-		.pNext=nullptr,
-		.flags=VK_DEVICE_QUEUE_PROTECTED_BIT,
-		.queueFamilyIndex=0, //temporary
-		.queueFamiliyCount=0, //temporary
-		.pQueuePriorities=0, //temporary
-	};
-	
-  VkDeviceCreateInfo createInfo{
-		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-		.pNext = nullptr , //temporary
-		.queueCreateInfoCount = 0, //temporary
-		.pQueueCreateInfo = &queueCreateInfo,
-		.enabledLayerCount = 0, //temporary
-		.ppEnabledLayerNames = "", //temporary
-    .enabledExtensionCount = 0,  // temporary
-    .ppEnabledExtensionNames = "",  // temporary
-	  .pEnabledFeatures=nullptr
-	};
-	if(VK_SUCCESS!=vkCreateDevice(physicaldevice,&createInfo,&allocator,&device)){
-		return false;
-	}
+bool Engine::createDevice() {
+  float queuePriority = 1.0f;
+  VkDeviceQueueCreateInfo queueCreateInfo {
+    .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+    .pNext = nullptr,
+    .flags = 0,
+    .queueFamilyIndex = 0, // Update with appropriate value
+    .queueCount = 1,
+    .pQueuePriorities = &queuePriority
+  };
+
+  VkDeviceCreateInfo createInfo {
+    .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+    .pNext = nullptr,
+    .queueCreateInfoCount = 1,
+    .pQueueCreateInfos = &queueCreateInfo,
+    .enabledLayerCount = 0,
+    .ppEnabledLayerNames = nullptr,
+    .enabledExtensionCount = 0,
+    .ppEnabledExtensionNames = nullptr,
+    .pEnabledFeatures = nullptr
+  };
+
+  if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS) {
+    return false;
+  }
+
+  vkGetDeviceQueue(device, 0, 0, &graphicsQueue);
+  return true;
+}
+
+bool Engine::createSurface() {
+  VkAndroidSurfaceCreateInfoKHR surfaceCreateInfo {
+    .sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR,
+    .pNext = nullptr,
+    .window = window
+  };
+
+  if (vkCreateAndroidSurfaceKHR(instance, &surfaceCreateInfo, nullptr, &surface) != VK_SUCCESS) {
+    return false;
+  }
   return true;
 }
 
 bool Engine::createSwapChain() {
-  // Implement Vulkan swap chain creation here
-  return true;
-}
+    // Query the surface capabilities
+    VkSurfaceCapabilitiesKHR capabilities;
+    if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities) != VK_SUCCESS) {
+        return false;
+    }
 
+    // Query supported surface formats
+    uint32_t formatCount;
+    if (vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, nullptr) != VK_SUCCESS) {
+        return false;
+    }
+
+    std::vector<VkSurfaceFormatKHR> formats(formatCount);
+    if (vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, formats.data()) != VK_SUCCESS) {
+        return false;
+    }
+
+    VkSurfaceFormatKHR surfaceFormat = formats[0];
+    for (const auto& format : formats) {
+        if (format.format == VK_FORMAT_B8G8R8A8_UNORM && format.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR) {
+            surfaceFormat = format;
+            break;
+        }
+    }
+
+    // Query supported present modes
+    uint32_t presentModeCount;
+    if (vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, nullptr) != VK_SUCCESS) {
+        return false;
+    }
+
+    std::vector<VkPresentModeKHR> presentModes(presentModeCount);
+    if (vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, presentModes.data()) != VK_SUCCESS) {
+        return false;
+    }
+
+    VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR; // FIFO is always supported
+    for (const auto& mode : presentModes) {
+        if (mode == VK_PRESENT_MODE_MAILBOX_KHR) {
+            presentMode = mode;
+            break;
+        }
+    }
+
+    // Set up swapchain creation info
+    VkSwapchainCreateInfoKHR swapChainInfo = {};
+    swapChainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapChainInfo.surface = surface;
+    swapChainInfo.minImageCount = capabilities.minImageCount + 1;
+    swapChainInfo.imageFormat = surfaceFormat.format;
+    swapChainInfo.imageColorSpace = surfaceFormat.colorSpace;
+    swapChainInfo.imageExtent = capabilities.currentExtent;
+    swapChainInfo.imageArrayLayers = 1;
+    swapChainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    uint32_t queueFamilyIndices[] = { 0 }; // Update with actual queue family indices
+    if (queueFamilyIndices[0] != queueFamilyIndices[1]) {
+        swapChainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+        swapChainInfo.queueFamilyIndexCount = 2;
+        swapChainInfo.pQueueFamilyIndices = queueFamilyIndices;
+    } else {
+        swapChainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        swapChainInfo.queueFamilyIndexCount = 0;
+        swapChainInfo.pQueueFamilyIndices = nullptr;
+    }
+
+    swapChainInfo.preTransform = capabilities.currentTransform;
+    swapChainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    swapChainInfo.presentMode = presentMode;
+    swapChainInfo.clipped = VK_TRUE;
+    swapChainInfo.oldSwapchain = VK_NULL_HANDLE;
+
+    if (vkCreateSwapchainKHR(device, &swapChainInfo, nullptr, &swapChain) != VK_SUCCESS) {
+        return false;
+    }
+
+    // Retrieve swapchain images
+    uint32_t imageCount;
+    if (vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr) != VK_SUCCESS) {
+        return false;
+    }
+
+    swapChainImages.resize(imageCount);
+    if (vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages.data()) != VK_SUCCESS) {
+        return false;
+    }
+
+    return true;
+}
 bool Engine::createImageViews() {
-  // Implement image views creation here
+  
   return true;
 }
 
@@ -151,10 +262,30 @@ bool Engine::createCommandBuffer() {
 }
 
 bool Engine::createSemaphores() {
-  // Implement semaphores creation here
+  VkSemaphoreCreateInfo semaphoreInfo {
+    .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+    .pNext = nullptr,
+    .flags = 0
+  };
+
+  if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS ||
+      vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS) {
+    return false;
+  }
   return true;
 }
 
 void Engine::cleanupSwapChain() {
-  // Implement swap chain cleanup here
+  if (framebuffer != VK_NULL_HANDLE) {
+    vkDestroyFramebuffer(device, framebuffer, nullptr);
+    framebuffer = VK_NULL_HANDLE;
+  }
+  if (swapChainImageView != VK_NULL_HANDLE) {
+    vkDestroyImageView(device, swapChainImageView, nullptr);
+    swapChainImageView = VK_NULL_HANDLE;
+  }
+  if (swapChain != VK_NULL_HANDLE) {
+    vkDestroySwapchainKHR(device, swapChain, nullptr);
+    swapChain = VK_NULL_HANDLE;
+  }
 }

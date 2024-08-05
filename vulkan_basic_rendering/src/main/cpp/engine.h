@@ -5,13 +5,15 @@
 #include <stdexcept>
 #include <iostream>
 #include <string>
+#include <android/native_window.h>
+#include <algorithm>
 
 class Engine {
 public:
     Engine();
     ~Engine();
 
-    bool initialize(VkAllocationCallbacks* allocator,std::string* appName,uint32_t appVersion,std::string* engineName,uint32_t engineVers,uint32_t physicalDeviceIndex);
+    bool initialize(std::string* appName, uint32_t appVersion, std::string* engineName, uint32_t engineVers, uint32_t physicalDeviceIndex, ANativeWindow* window);
     void cleanup();
     void drawFrame();
 
@@ -30,11 +32,12 @@ private:
     VkCommandBuffer commandBuffer;
     VkSemaphore imageAvailableSemaphore;
     VkSemaphore renderFinishedSemaphore;
+    ANativeWindow* window;
 
     std::vector<VkImage> swapChainImages;
 
-    bool createInstance(VkAllocationCallbacks* allocator,std::string* appName,uint32_t appVersion,std::string* engineName, uint32_t engineVers);
-    bool createDevice(VkAllocationCallbacks* allocator);
+    bool createInstance(std::string* appName, uint32_t appVersion, std::string* engineName, uint32_t engineVers);
+    bool createDevice();
     bool createSwapChain();
     bool createImageViews();
     bool createRenderPass();
@@ -43,6 +46,7 @@ private:
     bool createCommandPool();
     bool createCommandBuffer();
     bool createSemaphores();
-    void pickPhysicalDevice(VkAllocationCallbacks* allocator);
+    void pickPhysicalDevice();
     void cleanupSwapChain();
+    bool createSurface();
 };
